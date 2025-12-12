@@ -69,6 +69,9 @@ def commits_api():
     results = [{'Minute': minute, 'Count': count} for minute, count in commit_counts.items()]
     
     return jsonify(results=results)
+@app.route("/commits/")
+def moncommits():
+    return render_template("commits.html")
 
   
   
