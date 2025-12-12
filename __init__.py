@@ -37,6 +37,39 @@ def mongraphique():
 @app.route("/histogramme/")
 def monhistogramme():
     return render_template("histogramme.html")
+@app.route('/commits-api/') # Nouvelle route pour l'API interne
+def commits_api():
+    # URL de l'API GitHub pour les commits du dépôt
+    github_api_url = 'https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits'
+    
+    response = urlopen(github_api_url)
+    raw_content = response.read()
+    json_content = json.loads(raw_content.decode('utf-8'))
+    
+    # Dictionnaire pour stocker le compte des commits par minute
+    commit_counts = {}
+    
+    for commit_data in json_content:
+        # Indice N°2 : Extraire la chaîne de date
+        date_string = commit_data.get('commit', {}).get('author', {}).get('date')
+        
+        if date_string:
+            try:
+                # Indice N°3 : Extraire la minute
+                date_object = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
+                commit_minute = date_object.strftime('%Y-%m-%d %H:%M') # Format "AAAA-MM-JJ HH:MM"
+                
+                # Incrémenter le compteur pour cette minute
+                commit_counts[commit_minute] = commit_counts.get(commit_minute, 0) + 1
+            except ValueError:
+                # Gérer les erreurs de format de date si nécessaire
+                continue
+
+    # Convertir le dictionnaire en une liste de résultats pour jsonify
+    results = [{'Minute': minute, 'Count': count} for minute, count in commit_counts.items()]
+    
+    return jsonify(results=results)
+
   
   
 if __name__ == "__main__":
