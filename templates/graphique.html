@@ -6,41 +6,44 @@
   </head>
   <body>
     <div id="chart_div"></div>
+
     <script>
+      // 3. Initialisation de Google Charts
       google.charts.load('current', { packages: ['corechart'] });
       google.charts.setOnLoadCallback(drawBackgroundColor);
-      
+
       function drawBackgroundColor() {
+
+        // Fonction pour dessiner le graphique après réception des données
         function drawChart(data) {
-          // 1. Conversion des données récupérées en un tableau utilisable par Google Charts
+          // Convertir les données JSON en un tableau utilisable par Google Charts
           var dataTable = new google.visualization.DataTable();
-          dataTable.addColumn('string', 'Date');
-          dataTable.addColumn('number', 'Valeur');
-          
+          dataTable.addColumn('string', 'Date'); // Colonne des dates
+          dataTable.addColumn('number', 'Valeur'); // Colonne des températures
+
           data.results.forEach(entry => {
-            // Conversion du Timestamp UNIX (secondes) en objet Date
+            // Conversion du Timestamp (secondes) en objet Date JS (millisecondes)
             var date = new Date(entry.Jour * 1000); 
-            // Ajout de la ligne [Date au format local, Température]
-            dataTable.addRow([date.toLocaleDateString(), entry.temp]);
+            dataTable.addRow([date.toLocaleDateString(), entry.temp]); // Ajout des données
           });
-          
-          // 2. Configurer les options du graphique
+
+          // Configurer les options du graphique
           var options = {
             title: 'Évolution des températures de la ville de Tawarano',
             curveType: 'function',
             legend: { position: 'bottom' }
           };
-          
-          // 3. Dessiner le graphique en ligne (LineChart)
+
+          // Dessiner le graphique
           var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
           chart.draw(dataTable, options);
         }
-        
-        // 4. Récupération des données depuis notre API /tawarano/
+
+        // 4. Récupération des données depuis notre API Flask /tawarano/
         fetch('/tawarano/')
           .then(response => response.json()) // Convertit la réponse en JSON
           .then(data => {
-            drawChart(data); // Appelle la fonction de dessin avec les données
+            drawChart(data); // Passe le JSON à la fonction de dessin
           })
       }
     </script>
