@@ -9,7 +9,8 @@ app = Flask(__name__)
                                                                                                                                        
 @app.route("/contact/")
 def MaPremiereAPI():
-    return "<h2>Ma page de contact</h2>"
+    # Affiche le fichier HTML à la place du texte brut
+    return render_template("contact.html")
 @app.route('/tawarano/')
 def meteo():
     # Remplacez l'URL si nécessaire, mais l'exercice utilise la version sample
