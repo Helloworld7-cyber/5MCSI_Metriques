@@ -1,9 +1,48 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Graphique</title>
- </head>  
-<body>
-    <h2>Mon Graphique</h2>
-</body>
+    <title>Metrique</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  </head>
+  <body>
+    <div id="chart_div"></div>
+    <script>
+      google.charts.load('current', { packages: ['corechart'] });
+      google.charts.setOnLoadCallback(drawBackgroundColor);
+      
+      function drawBackgroundColor() {
+        function drawChart(data) {
+          // 1. Conversion des données récupérées en un tableau utilisable par Google Charts
+          var dataTable = new google.visualization.DataTable();
+          dataTable.addColumn('string', 'Date');
+          dataTable.addColumn('number', 'Valeur');
+          
+          data.results.forEach(entry => {
+            // Conversion du Timestamp UNIX (secondes) en objet Date
+            var date = new Date(entry.Jour * 1000); 
+            // Ajout de la ligne [Date au format local, Température]
+            dataTable.addRow([date.toLocaleDateString(), entry.temp]);
+          });
+          
+          // 2. Configurer les options du graphique
+          var options = {
+            title: 'Évolution des températures de la ville de Tawarano',
+            curveType: 'function',
+            legend: { position: 'bottom' }
+          };
+          
+          // 3. Dessiner le graphique en ligne (LineChart)
+          var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+          chart.draw(dataTable, options);
+        }
+        
+        // 4. Récupération des données depuis notre API /tawarano/
+        fetch('/tawarano/')
+          .then(response => response.json()) // Convertit la réponse en JSON
+          .then(data => {
+            drawChart(data); // Appelle la fonction de dessin avec les données
+          })
+      }
+    </script>
+  </body>
 </html>
