@@ -29,6 +29,10 @@ def meteo():
         
     # Retourne les résultats au format JSON
     return jsonify(results=results)
+@app.route("/rapport/")
+def mongraphique():
+    # Flask cherche automatiquement le fichier dans le dossier 'templates'
+    return render_template("graphique.html")
   
   
 if __name__ == "__main__":
